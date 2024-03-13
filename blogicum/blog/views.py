@@ -23,7 +23,7 @@ def post_detail(request, post_id):
         post = Post.objects.get(id=post_id)
         if (post.pub_date > current_time or
             not post.is_published or
-                not post.category.is_published):
+            not post.category.is_published):
             raise Http404(f'Post with id {post_id} is not available')
     except Post.DoesNotExist:
         raise Http404(f'Post with id {post_id} not found')
