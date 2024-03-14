@@ -1,6 +1,6 @@
-from django.db import models
-
 from django.contrib.auth import get_user_model
+
+from django.db import models
 
 User = get_user_model()
 
@@ -28,12 +28,15 @@ class Category(PublishedModel):
         max_length=64, unique=True,
         verbose_name='Идентификатор',
         help_text='Идентификатор страницы для URL; '
-        'разрешены символы латиницы, цифры, дефис и подчёркивание.'
+                  'разрешены символы латиницы, цифры, дефис и подчёркивание.'
     )
 
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return self.name
 
 
 class Location(PublishedModel):
@@ -51,26 +54,33 @@ class Post(PublishedModel):
     pub_date = models.DateTimeField(
         verbose_name='Дата и время публикации',
         help_text='Если установить дату и время в будущем — можно делать '
-        'отложенные публикации.'
+                  'отложенные публикации.'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name='Автор публикации'
+        verbose_name='Автор публикации',
+        related_name='posts'
     )
     location = models.ForeignKey(
         Location,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name='Местоположение'
+        verbose_name='Местоположение',
+        related_name='posts'
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name='Категория'
+        verbose_name='Категория',
+        related_name='posts'
     )
 
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.title
