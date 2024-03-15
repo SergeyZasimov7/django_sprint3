@@ -4,8 +4,8 @@ from django.utils import timezone
 from .models import Category, Post
 
 
-def get_published_posts(queryset):
-    return queryset.filter(
+def get_published_posts(posts):
+    return posts.filter(
         pub_date__lte=timezone.now(),
         is_published=True,
         category__is_published=True
@@ -13,8 +13,9 @@ def get_published_posts(queryset):
 
 
 def index(request):
-    posts = get_published_posts(Post.objects)[:5]
-    return render(request, 'blog/index.html', {'posts': posts})
+    return render(request, 'blog/index.html', {'posts': get_published_posts(
+        Post.objects)[:5]}
+    )
 
 
 def post_detail(request, post_id):
@@ -25,11 +26,11 @@ def post_detail(request, post_id):
 
 def category_posts(request, category_slug):
     category = get_object_or_404(
-        Category.objects.filter(is_published=True),
-        slug=category_slug
+        Category,
+        slug=category_slug,
+        is_published=True
     )
-    posts_in_category = get_published_posts(category.posts)
     return render(request, 'blog/category.html', {
         'category': category,
-        'posts': posts_in_category
+        'posts': get_published_posts(category.posts)
     })
